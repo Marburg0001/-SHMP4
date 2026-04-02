@@ -78,6 +78,7 @@
       justify-content:center;
       gap:14px;
       margin-bottom:15px;
+      flex-wrap:wrap;
     }
 
     .socials .icon{
@@ -221,8 +222,19 @@
       justify-content:center;
     }
 
-    .thumb-box::before{
-      content:"VIDEO";
+    .thumb-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:none;
+    }
+
+    .thumb-placeholder{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       font-size:42px;
       font-weight:800;
       color:rgba(255,255,255,0.14);
@@ -365,6 +377,10 @@
       .analyze-btn, .download-btn{
         width:100%;
       }
+
+      .progress-head{
+        flex-direction:column;
+      }
     }
   </style>
 </head>
@@ -389,7 +405,7 @@
     </div>
 
     <div class="logo">İSHMP4</div>
-    <div class="subtitle"> </div>
+    <div class="subtitle">Linki yapıştır, analiz et, gerçek video indir.</div>
 
     <div class="input-area">
       <input type="text" id="videoUrl" placeholder="Video linkini buraya yapıştır..." />
@@ -398,6 +414,8 @@
 
     <div class="preview-card" id="previewCard">
       <div class="thumb-box">
+        <img id="thumbImage" alt="Video görseli">
+        <div class="thumb-placeholder" id="thumbPlaceholder">VIDEO</div>
         <div class="thumb-overlay">
           <div class="thumb-badge" id="thumbBadge">Hazır</div>
         </div>
@@ -406,7 +424,7 @@
       <div class="meta">
         <div class="platform-badge" id="platformBadge">Platform: Bilinmiyor</div>
         <h2 id="videoTitle">Video hazır görünüyor</h2>
-        <p id="videoDesc">Link algılandıktan sonra burada platform bilgisi ve indir ekranı görünür.</p>
+        <p id="videoDesc">Link algılandıktan sonra burada video bilgisi görünür.</p>
         <button class="download-btn" id="downloadBtn">İndir</button>
       </div>
     </div>
@@ -421,7 +439,7 @@
       </div>
     </div>
 
-    <div class="footer">© 2026 İSHMP4 </div>
+    <div class="footer">© 2026 İSHMP4</div>
   </div>
 
   <script>
@@ -432,12 +450,18 @@
     const videoTitle = document.getElementById("videoTitle");
     const videoDesc = document.getElementById("videoDesc");
     const thumbBadge = document.getElementById("thumbBadge");
+    const thumbImage = document.getElementById("thumbImage");
+    const thumbPlaceholder = document.getElementById("thumbPlaceholder");
     const downloadBtn = document.getElementById("downloadBtn");
     const progressWrap = document.getElementById("progressWrap");
     const progressFill = document.getElementById("progressFill");
     const progressText = document.getElementById("progressText");
     const progressPercent = document.getElementById("progressPercent");
     const popup = document.getElementById("popup");
+
+    let currentLink = "";
+    let currentJobId = null;
+    let pollingInterval = null;
 
     function showPopup(message, type = "success") {
       popup.className = "popup " + type;
@@ -449,28 +473,10 @@
       }, 2800);
     }
 
-    function detectPlatform(url) {
-      const lower = url.toLowerCase();
+    async function analyzeVideo() {
+      const link = videoUrl.value.trim();
 
-      if (lower.includes("instagram.com")) return "Instagram";
-      if (lower.includes("tiktok.com")) return "TikTok";
-      if (lower.includes("facebook.com") || lower.includes("fb.watch")) return "Facebook";
-      if (lower.includes("youtube.com") || lower.includes("youtu.be")) return "YouTube";
-      return "Bilinmiyor";
-    }
-
-    function generateFakeTitle(platform) {
-      if (platform === "Instagram") return "Instagram videosu hazır görünüyor";
-      if (platform === "TikTok") return "TikTok videosu hazır görünüyor";
-      if (platform === "Facebook") return "Facebook videosu hazır görünüyor";
-      if (platform === "YouTube") return "YouTube videosu hazır görünüyor";
-      return "Video bağlantısı hazır görünüyor";
-    }
-
-    analyzeBtn.addEventListener("click", () => {
-      const url = videoUrl.value.trim();
-
-      if (!url) {
+      if (!link) {
         showPopup("Link boş bırakılmış.", "error");
         return;
       }
@@ -478,56 +484,140 @@
       analyzeBtn.classList.add("active");
       analyzeBtn.textContent = "Analiz Ediliyor...";
 
-      setTimeout(() => {
-        const platform = detectPlatform(url);
+      try {
+        const res = await fetch("/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ link })
+        });
 
-        platformBadge.textContent = "Platform: " + platform;
-        videoTitle.textContent = generateFakeTitle(platform);
-        videoDesc.textContent = "Arayüz görünümü hazır. İndir butonuna basınca süreç animasyonlu şekilde çalışır.";
-        thumbBadge.textContent = platform === "Bilinmiyor" ? "Genel Video" : platform;
+        const data = await res.json();
+
+        if (!data.success) {
+          showPopup(data.error || "Analiz başarısız.", "error");
+          return;
+        }
+
+        currentLink = link;
+        platformBadge.textContent = "Platform: " + (data.platform || "Bilinmiyor");
+        videoTitle.textContent = data.title || "Video hazır";
+        videoDesc.textContent = "Gerçek indirme hazır. İndir butonuna basınca dosya hazırlanır.";
+        thumbBadge.textContent = data.platform || "Video";
+
+        if (data.thumbnail) {
+          thumbImage.src = data.thumbnail;
+          thumbImage.style.display = "block";
+          thumbPlaceholder.style.display = "none";
+        } else {
+          thumbImage.style.display = "none";
+          thumbPlaceholder.style.display = "flex";
+        }
 
         previewCard.style.display = "grid";
+        downloadBtn.textContent = "İndir";
+        downloadBtn.classList.remove("ready");
 
+        showPopup("Video bilgileri alındı.", "success");
+      } catch (err) {
+        showPopup("Sunucu bağlantı hatası.", "error");
+      } finally {
         analyzeBtn.classList.remove("active");
         analyzeBtn.textContent = "Analiz Et";
+      }
+    }
 
-        showPopup("Link algılandı.", "success");
-      }, 900);
-    });
+    async function startDownload() {
+      if (!currentLink) {
+        showPopup("Önce linki analiz et.", "error");
+        return;
+      }
 
-    downloadBtn.addEventListener("click", () => {
-      progressWrap.style.display = "block";
       downloadBtn.classList.add("ready");
       downloadBtn.textContent = "Hazırlanıyor...";
-
-      let percent = 0;
+      progressWrap.style.display = "block";
       progressFill.style.width = "0%";
       progressPercent.textContent = "0%";
       progressText.textContent = "İndirme başlatılıyor...";
 
-      const interval = setInterval(() => {
-        percent += Math.floor(Math.random() * 12) + 6;
+      try {
+        const res = await fetch("/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ link: currentLink })
+        });
 
-        if (percent >= 100) {
-          percent = 100;
+        const data = await res.json();
+
+        if (!data.success) {
+          showPopup(data.error || "İndirme başlatılamadı.", "error");
+          return;
         }
 
-        progressFill.style.width = percent + "%";
-        progressPercent.textContent = percent + "%";
+        currentJobId = data.job_id;
+        pollProgress();
+      } catch (err) {
+        showPopup("İndirme başlatılırken hata oldu.", "error");
+      }
+    }
 
-        if (percent < 35) {
-          progressText.textContent = "Bağlantı hazırlanıyor...";
-        } else if (percent < 70) {
-          progressText.textContent = "Dosya işleniyor...";
-        } else if (percent < 100) {
-          progressText.textContent = "İndirmeye hazır hale getiriliyor...";
-        } else {
-          progressText.textContent = "Tamamlandı.";
-          clearInterval(interval);
-          downloadBtn.textContent = "İndirildi";
-          showPopup("İşlem tamamlandı.", "success");
+    function pollProgress() {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+
+      pollingInterval = setInterval(async () => {
+        if (!currentJobId) return;
+
+        try {
+          const res = await fetch(`/progress/${currentJobId}`);
+          const data = await res.json();
+
+          if (!data.success) {
+            clearInterval(pollingInterval);
+            showPopup(data.error || "İlerleme alınamadı.", "error");
+            return;
+          }
+
+          const percent = Number(data.percent || 0);
+          progressFill.style.width = percent + "%";
+          progressPercent.textContent = percent + "%";
+
+          if (data.status === "starting") {
+            progressText.textContent = "İndirme hazırlanıyor...";
+          } else if (data.status === "downloading") {
+            progressText.textContent = "Video indiriliyor...";
+          } else if (data.status === "processing") {
+            progressText.textContent = "Dosya hazırlanıyor...";
+          } else if (data.status === "done") {
+            clearInterval(pollingInterval);
+            progressText.textContent = "Tamamlandı.";
+            progressFill.style.width = "100%";
+            progressPercent.textContent = "100%";
+            downloadBtn.textContent = "İndirildi";
+            showPopup("İşlem tamamlandı.", "success");
+            window.location.href = `/file/${currentJobId}`;
+          } else if (data.status === "error") {
+            clearInterval(pollingInterval);
+            progressText.textContent = "Hata oluştu.";
+            showPopup(data.error || "İndirme sırasında hata oluştu.", "error");
+            downloadBtn.textContent = "Tekrar Dene";
+            downloadBtn.classList.remove("ready");
+          }
+        } catch (err) {
+          clearInterval(pollingInterval);
+          showPopup("İlerleme kontrol edilemedi.", "error");
         }
-      }, 300);
+      }, 1200);
+    }
+
+    analyzeBtn.addEventListener("click", analyzeVideo);
+    downloadBtn.addEventListener("click", startDownload);
+
+    videoUrl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        analyzeVideo();
+      }
     });
   </script>
 </body>
