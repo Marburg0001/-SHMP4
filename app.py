@@ -25,15 +25,20 @@ def home():
         link = request.form.get("link", "").strip()
 
         if not link:
-            return html.replace("</body>", "<p style='text-align:center;color:red;'>Link boş olamaz.</p></body>")
+            return html.replace(
+                "</body>",
+                "<p style='text-align:center;color:red;margin-top:20px;'>Link boş olamaz.</p></body>"
+            )
 
         try:
             cleanup_old_downloads()
 
             ydl_opts = {
-                "format": "best",
+                "format": "best[ext=mp4]/best",
                 "outtmpl": "downloaded_video.%(ext)s",
-                "noplaylist": True
+                "noplaylist": True,
+                "quiet": True,
+                "no_warnings": True
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -41,8 +46,11 @@ def home():
                 filename = ydl.prepare_filename(info)
 
             safe_name = secure_filename(info.get("title", "video"))
-            ext = filename.split(".")[-1]
-            download_name = f"{safe_name}.{ext}"
+            if not safe_name:
+                safe_name = "video"
+
+            ext = os.path.splitext(filename)[1]
+            download_name = f"{safe_name}{ext}"
 
             return send_file(filename, as_attachment=True, download_name=download_name)
 
