@@ -64,14 +64,6 @@
       font-size: 13px;
       font-weight: 700;
       box-shadow: 0 0 10px rgba(255, 0, 0, 0.15);
-      transition: 0.2s ease;
-      cursor: pointer;
-    }
-
-    .platform-icon:hover {
-      background: #1a0000;
-      transform: translateY(-2px);
-      box-shadow: 0 0 18px rgba(255, 0, 0, 0.25);
     }
 
     .main {
@@ -100,11 +92,6 @@
       color: white;
       padding: 0 16px;
       font-size: 15px;
-      box-shadow: 0 0 18px rgba(255, 0, 0, 0.12);
-    }
-
-    .input-box::placeholder {
-      color: #888;
     }
 
     .download-btn {
@@ -117,30 +104,6 @@
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.2s ease;
-      box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
-    }
-
-    .download-btn:hover {
-      background: #d60000;
-      transform: scale(1.03);
-    }
-
-    @media (max-width: 700px) {
-      .topbar {
-        flex-direction: column;
-        gap: 20px;
-        margin-bottom: 60px;
-      }
-
-      .logo {
-        font-size: 28px;
-      }
-
-      .platforms {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
     }
   </style>
 </head>
@@ -159,11 +122,11 @@
     <div class="main">
       <div class="download-box">
 
-        <!-- 🔥 BURASI ÖNEMLİ -->
-        <form method="POST">
+        <form method="POST" onsubmit="clearLinkAfterSubmit()">
           <input
             type="text"
             name="link"
+            id="linkInput"
             class="input-box"
             placeholder="Link yapıştır..."
           />
@@ -173,5 +136,13 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function clearLinkAfterSubmit() {
+      setTimeout(() => {
+        document.getElementById("linkInput").value = "";
+      }, 500);
+    }
+  </script>
 </body>
 </html>
