@@ -425,13 +425,13 @@
         <div class="platform-badge" id="platformBadge">Platform: Bilinmiyor</div>
         <h2 id="videoTitle">Video hazır görünüyor</h2>
         <p id="videoDesc">Link algılandıktan sonra burada video bilgisi görünür.</p>
-        <button class="download-btn" id="downloadBtn">İndir</button>
+        <button class="download-btn" id="downloadBtn">KAYDET</button>
       </div>
     </div>
 
     <div class="progress-wrap" id="progressWrap">
       <div class="progress-head">
-        <span id="progressText">İndirme hazırlanıyor...</span>
+        <span id="progressText">Kaydetme hazırlanıyor...</span>
         <span id="progressPercent">0%</span>
       </div>
       <div class="progress-bar">
@@ -501,7 +501,7 @@
         currentLink = link;
         platformBadge.textContent = "Platform: " + (data.platform || "Bilinmiyor");
         videoTitle.textContent = data.title || "Video hazır";
-        videoDesc.textContent = "Gerçek indirme hazır. İndir butonuna basınca dosya hazırlanır.";
+        videoDesc.textContent = "Gerçek kaydetme hazır. Kaydet butonuna basınca dosya hazırlanır.";
         thumbBadge.textContent = data.platform || "Video";
 
         if (data.thumbnail) {
@@ -514,7 +514,7 @@
         }
 
         previewCard.style.display = "grid";
-        downloadBtn.textContent = "İndir";
+        downloadBtn.textContent = "Kaydet";
         downloadBtn.classList.remove("ready");
 
         showPopup("Video bilgileri alındı.", "success");
@@ -537,7 +537,7 @@
       progressWrap.style.display = "block";
       progressFill.style.width = "0%";
       progressPercent.textContent = "0%";
-      progressText.textContent = "İndirme başlatılıyor...";
+      progressText.textContent = "Kaydetme başlatılıyor...";
 
       try {
         const res = await fetch("/download", {
@@ -549,14 +549,14 @@
         const data = await res.json();
 
         if (!data.success) {
-          showPopup(data.error || "İndirme başlatılamadı.", "error");
+          showPopup(data.error || "Kaydetme başlatılamadı.", "error");
           return;
         }
 
         currentJobId = data.job_id;
         pollProgress();
       } catch (err) {
-        showPopup("İndirme başlatılırken hata oldu.", "error");
+        showPopup("Kaydetme başlatılırken hata oldu.", "error");
       }
     }
 
@@ -583,9 +583,9 @@
           progressPercent.textContent = percent + "%";
 
           if (data.status === "starting") {
-            progressText.textContent = "İndirme hazırlanıyor...";
+            progressText.textContent = "Kaydetme hazırlanıyor...";
           } else if (data.status === "downloading") {
-            progressText.textContent = "Video indiriliyor...";
+            progressText.textContent = "Video kaydediliyor...";
           } else if (data.status === "processing") {
             progressText.textContent = "Dosya hazırlanıyor...";
           } else if (data.status === "done") {
@@ -593,13 +593,13 @@
             progressText.textContent = "Tamamlandı.";
             progressFill.style.width = "100%";
             progressPercent.textContent = "100%";
-            downloadBtn.textContent = "İndirildi";
+            downloadBtn.textContent = "Başarılı";
             showPopup("İşlem tamamlandı.", "success");
             window.location.href = `/file/${currentJobId}`;
           } else if (data.status === "error") {
             clearInterval(pollingInterval);
             progressText.textContent = "Hata oluştu.";
-            showPopup(data.error || "İndirme sırasında hata oluştu.", "error");
+            showPopup(data.error || "devam ederken sorun oluştu.", "error");
             downloadBtn.textContent = "Tekrar Dene";
             downloadBtn.classList.remove("ready");
           }
