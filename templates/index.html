@@ -340,16 +340,20 @@
         <div class="badge">Karanlık tema, göz yormaz</div>
       </div>
 
-      <div class="download-box">
-        <h2>Bağlantıyı ekle</h2>
-        <p>Desteklenen platformlardan bir video linki gir, içeriği görüntüle ve kaydetme adımına geç.</p>
-        <div class="input-row">
-          <input type="text" placeholder="Instagram, TikTok, YouTube veya Facebook bağlantısı" />
-          <button class="btn btn-secondary">Önizle</button>
-          <button class="btn btn-primary">Kaydet</button>
-        </div>
-      </div>
-    </div>
+<div class="download-box">
+  <h2>Bağlantıyı ekle</h2>
+  <p>Desteklenen platformlardan bir video linki gir ve kaydet.</p>
+
+  <form action="/download" method="post" class="input-row">
+    <input
+      type="text"
+      name="url"
+      placeholder="Instagram, TikTok, YouTube veya Facebook bağlantısı"
+      required
+    />
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+</div>
   </section>
 
   <section class="section" id="ozellikler">
