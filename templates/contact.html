@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+  <main class="page-hero">
+    <div class="container contact-grid">
+      <div class="page-card">
+        <h1>İletişim</h1>
+        <p>
+          Geri bildirim, iş birliği veya teknik konu için aşağıdaki formu bırakabilir ya da doğrudan e-posta
+          üzerinden ulaşabilirsin.
+        </p>
+        <p>
+          <a class="inline-mail" href="mailto:ishaksrks@gmail.com">✉️ ishaksrks@gmail.com</a>
+        </p>
+        <p class="small-muted">
+          Form gönderildiğinde mesaj sunucu tarafında kayıt altına alınır. Yani bu bölüm süs değil, gerçekten çalışır.
+        </p>
+      </div>
+
+      <div class="page-card">
+        {% if error %}
+          <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+        {% if success %}
+          <div class="alert alert-success">Mesajın alındı. Kayıt edildi.</div>
+        {% endif %}
+
+        <form method="POST" class="form-grid">
+          <div class="field">
+            <label>Ad Soyad</label>
+            <input type="text" name="name" placeholder="Adını yaz">
+          </div>
+
+          <div class="field">
+            <label>E-posta</label>
+            <input type="email" name="email" placeholder="ornek@mail.com">
+          </div>
+
+          <div class="field">
+            <label>Mesaj</label>
+            <textarea name="message" placeholder="Ne söylemek istiyorsan buraya yaz"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Mesajı Gönder</button>
+        </form>
+      </div>
+    </div>
+  </main>
+{% endblock %}
