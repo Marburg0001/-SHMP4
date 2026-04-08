@@ -17,49 +17,33 @@
       </div>
 
       <div class="page-card">
-        <div id="successBox" class="alert alert-success" style="display:none;">
-          Mesajın gönderildi. Sana döneceğim.
-        </div>
+        {% if request.args.get('sent') == '1' %}
+          <div class="alert alert-success">
+            Mesajın gönderildi. Sana döneceğim.
+          </div>
+        {% endif %}
 
-        <form id="contactForm" action="https://formspree.io/f/mykbvvor" method="POST" class="form-grid">
+        <form action="https://formspree.io/f/mykbvvor" method="POST" class="form-grid">
           <input type="hidden" name="_next" value="https://ishmp4.onrender.com/contact?sent=1">
 
           <div class="field">
-            <label>Ad Soyad</label>
-            <input type="text" name="name" placeholder="Adını yaz" required>
+            <label for="name">Ad Soyad</label>
+            <input id="name" type="text" name="name" placeholder="Adını yaz" required>
           </div>
 
           <div class="field">
-            <label>E-posta</label>
-            <input type="email" name="email" placeholder="ornek@mail.com" required>
+            <label for="email">E-posta</label>
+            <input id="email" type="email" name="email" placeholder="ornek@mail.com" required>
           </div>
 
           <div class="field">
-            <label>Mesaj</label>
-            <textarea name="message" placeholder="Ne söylemek istiyorsan buraya yaz" required></textarea>
+            <label for="message">Mesaj</label>
+            <textarea id="message" name="message" placeholder="Ne söylemek istiyorsan buraya yaz" required></textarea>
           </div>
 
-          <button id="submitBtn" type="submit" class="btn btn-primary">Mesajı Gönder</button>
+          <button type="submit" class="btn btn-primary">Mesajı Gönder</button>
         </form>
       </div>
     </div>
   </main>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const successBox = document.getElementById("successBox");
-    const form = document.getElementById("contactForm");
-    const submitBtn = document.getElementById("submitBtn");
-
-    if (params.get("sent") === "1") {
-      successBox.style.display = "block";
-    }
-
-    form.addEventListener("submit", function () {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Gönderiliyor...";
-      submitBtn.style.opacity = "0.7";
-      submitBtn.style.cursor = "not-allowed";
-    });
-  </script>
 {% endblock %}
