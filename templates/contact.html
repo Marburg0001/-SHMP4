@@ -17,12 +17,11 @@
       </div>
 
       <div class="page-card">
-
         <div id="successBox" class="alert alert-success" style="display:none;">
           Mesajın gönderildi. Sana döneceğim.
         </div>
 
-        <form action="https://formspree.io/f/mykbvvor" method="POST" class="form-grid">
+        <form id="contactForm" action="https://formspree.io/f/mykbvvor" method="POST" class="form-grid">
           <input type="hidden" name="_next" value="https://ishmp4.onrender.com/contact?sent=1">
 
           <div class="field">
@@ -40,7 +39,7 @@
             <textarea name="message" placeholder="Ne söylemek istiyorsan buraya yaz" required></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary">Mesajı Gönder</button>
+          <button id="submitBtn" type="submit" class="btn btn-primary">Mesajı Gönder</button>
         </form>
       </div>
     </div>
@@ -48,8 +47,19 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
+    const successBox = document.getElementById("successBox");
+    const form = document.getElementById("contactForm");
+    const submitBtn = document.getElementById("submitBtn");
+
     if (params.get("sent") === "1") {
-      document.getElementById("successBox").style.display = "block";
+      successBox.style.display = "block";
     }
+
+    form.addEventListener("submit", function () {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Gönderiliyor...";
+      submitBtn.style.opacity = "0.7";
+      submitBtn.style.cursor = "not-allowed";
+    });
   </script>
 {% endblock %}
