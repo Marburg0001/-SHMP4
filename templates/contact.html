@@ -12,32 +12,32 @@
           <a class="inline-mail" href="mailto:ishaksrks@gmail.com">✉️ ishaksrks@gmail.com</a>
         </p>
         <p class="small-muted">
-          Form gönderildiğinde mesaj sunucu tarafında kayıt altına alınır. Yani bu bölüm süs değil, gerçekten çalışır.
+          Formu gönderdiğinde mesaj doğrudan e-posta olarak iletilir.
         </p>
       </div>
 
       <div class="page-card">
-        {% if error %}
-          <div class="alert alert-error">{{ error }}</div>
-        {% endif %}
-        {% if success %}
-          <div class="alert alert-success">Mesajın alındı. Kayıt edildi.</div>
-        {% endif %}
 
-        <form method="POST" class="form-grid">
+        <div id="successBox" class="alert alert-success" style="display:none;">
+          Mesajın gönderildi. Sana döneceğim.
+        </div>
+
+        <form action="https://formspree.io/f/mykbvvor" method="POST" class="form-grid">
+          <input type="hidden" name="_next" value="https://ishmp4.onrender.com/contact?sent=1">
+
           <div class="field">
             <label>Ad Soyad</label>
-            <input type="text" name="name" placeholder="Adını yaz">
+            <input type="text" name="name" placeholder="Adını yaz" required>
           </div>
 
           <div class="field">
             <label>E-posta</label>
-            <input type="email" name="email" placeholder="ornek@mail.com">
+            <input type="email" name="email" placeholder="ornek@mail.com" required>
           </div>
 
           <div class="field">
             <label>Mesaj</label>
-            <textarea name="message" placeholder="Ne söylemek istiyorsan buraya yaz"></textarea>
+            <textarea name="message" placeholder="Ne söylemek istiyorsan buraya yaz" required></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary">Mesajı Gönder</button>
@@ -45,4 +45,11 @@
       </div>
     </div>
   </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("sent") === "1") {
+      document.getElementById("successBox").style.display = "block";
+    }
+  </script>
 {% endblock %}
