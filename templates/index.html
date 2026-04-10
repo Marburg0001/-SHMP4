@@ -118,9 +118,8 @@
     }
 
     .input-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      display: block;
+      width: 100%;
     }
 
     input, textarea {
@@ -128,28 +127,40 @@
       background: #0d0d0d;
       color: #fff;
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 15px 16px;
+      border-radius: 16px;
+      padding: 16px 18px;
       outline: none;
       font-size: 15px;
-    }
-
-    .input-row input {
-      flex: 1;
-      min-width: 240px;
-    }
-
-    .btn {
-      padding: 15px 22px;
-      border: none;
-      border-radius: 14px;
-      font-weight: 700;
-      cursor: pointer;
       transition: 0.2s ease;
     }
 
+    input:focus, textarea:focus {
+      border-color: rgba(255, 43, 43, 0.45);
+      box-shadow: 0 0 0 4px rgba(255, 43, 43, 0.08);
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 15px 26px;
+      min-width: 150px;
+      border: none;
+      border-radius: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    }
+
     .btn-primary {
-      background: #ff2b2b;
+      background: linear-gradient(135deg, #ff2b2b, #ff4d4d);
       color: white;
     }
 
@@ -160,8 +171,8 @@
     }
 
     .btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
+      transform: translateY(-2px);
+      opacity: 0.98;
     }
 
     .section {
@@ -309,6 +320,15 @@
       .contact-grid {
         grid-template-columns: 1fr;
       }
+
+      .button-row {
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .button-row .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -343,8 +363,12 @@
       <div class="download-box">
         <h2>Bağlantıyı ekle</h2>
         <p>Desteklenen platformlardan bir video linki gir, içeriği görüntüle ve kaydetme adımına geç.</p>
+
         <div class="input-row">
           <input id="urlInput" type="text" placeholder="Instagram, TikTok, YouTube veya Facebook bağlantısı" />
+        </div>
+
+        <div class="button-row">
           <button id="previewBtn" class="btn btn-secondary" type="button">Önizle</button>
           <button id="saveBtn" class="btn btn-primary" type="button">Kaydet</button>
         </div>
@@ -462,6 +486,7 @@
       </div>
     </div>
   </footer>
+
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
